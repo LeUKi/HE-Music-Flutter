@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../layout/adaptive_media_grid_spec.dart';
+import '../layout/ranking_layout_spec.dart';
 import 'animated_skeleton.dart';
 
 class SectionTitleSkeleton extends StatelessWidget {
-  const SectionTitleSkeleton({
-    this.width = 88,
-    super.key,
-  });
+  const SectionTitleSkeleton({this.width = 88, super.key});
 
   final double width;
 
@@ -112,17 +111,19 @@ class PlazaGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: padding,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.76,
-      ),
-      itemCount: itemCount,
-      itemBuilder: (context, index) {
-        return const GridCardSkeleton();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spec = resolveAdaptiveMediaGridSpec(
+          maxWidth: constraints.maxWidth,
+        );
+        return GridView.builder(
+          padding: padding,
+          gridDelegate: spec.sliverDelegate,
+          itemCount: itemCount,
+          itemBuilder: (context, index) {
+            return const GridCardSkeleton();
+          },
+        );
       },
     );
   }
@@ -174,7 +175,11 @@ class GridCardSkeleton extends StatelessWidget {
       children: <Widget>[
         AspectRatio(
           aspectRatio: 1,
-          child: SkeletonBox(width: double.infinity, height: double.infinity, radius: 18),
+          child: SkeletonBox(
+            width: double.infinity,
+            height: double.infinity,
+            radius: 18,
+          ),
         ),
         SizedBox(height: 10),
         SkeletonBox(width: double.infinity, height: 14, radius: 7),
@@ -351,8 +356,9 @@ class _RankingRowCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const spacing = 12.0;
-        final coverSide = ((constraints.maxWidth - spacing * 2) / 3) - 8;
+        final rowSpec = resolveRankingRowLayoutSpec(
+          maxWidth: constraints.maxWidth,
+        );
         return Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -367,11 +373,15 @@ class _RankingRowCardSkeleton extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SkeletonBox(width: coverSide, height: coverSide, radius: 18),
+                  SkeletonBox(
+                    width: rowSpec.coverSide,
+                    height: rowSpec.coverSide,
+                    radius: 18,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: SizedBox(
-                      height: coverSide,
+                      height: rowSpec.coverSide,
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,15 +420,16 @@ class _RankingGridSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const spacing = 12.0;
-        final itemWidth = (constraints.maxWidth - spacing * 2) / 3;
+        final gridSpec = resolveRankingGridLayoutSpec(
+          maxWidth: constraints.maxWidth,
+        );
         return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
+          spacing: gridSpec.spacing,
+          runSpacing: gridSpec.spacing,
           children: List<Widget>.generate(
-            3,
+            gridSpec.crossAxisCount,
             (_) => SizedBox(
-              width: itemWidth,
+              width: gridSpec.itemWidth,
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[

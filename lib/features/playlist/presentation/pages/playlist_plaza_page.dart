@@ -6,6 +6,7 @@ import '../../../../app/config/app_config_controller.dart';
 import '../../../../app/i18n/app_i18n.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../shared/models/he_music_models.dart';
+import '../../../../shared/layout/adaptive_media_grid_spec.dart';
 import '../../../../shared/widgets/media_grid_card.dart';
 import '../../../../shared/widgets/online_platform_tabs.dart';
 import '../../../../shared/widgets/plaza_loading_skeleton.dart';
@@ -333,43 +334,45 @@ class _PlaylistPlazaBody extends StatelessWidget {
     if (state.playlists.isEmpty) {
       return const _EmptyState(label: '当前分类下暂无歌单');
     }
-    return GridView.builder(
-      controller: scrollController,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.76,
-      ),
-      itemCount: state.playlists.length + (showTail ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index >= state.playlists.length) {
-          if (state.loadingMore) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return _LoadMoreRetryCard(
-            message: state.playlistsErrorMessage,
-            onRetry: onLoadMoreRetry,
-          );
-        }
-        final playlist = state.playlists[index];
-        return MediaGridCard(
-          kind: MediaGridCardKind.playlist,
-          title: playlist.name,
-          subtitle: playlist.creator,
-          coverUrl: playlist.cover,
-          playCount: playlist.playCount,
-          onTap: () => context.push(
-            Uri(
-              path: AppRoutes.playlistDetail,
-              queryParameters: <String, String>{
-                'id': playlist.id,
-                'platform': playlist.platform,
-                'title': playlist.name,
-              },
-            ).toString(),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spec = resolveAdaptiveMediaGridSpec(
+          maxWidth: constraints.maxWidth,
+        );
+        return GridView.builder(
+          controller: scrollController,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+          gridDelegate: spec.sliverDelegate,
+          itemCount: state.playlists.length + (showTail ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index >= state.playlists.length) {
+              if (state.loadingMore) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return _LoadMoreRetryCard(
+                message: state.playlistsErrorMessage,
+                onRetry: onLoadMoreRetry,
+              );
+            }
+            final playlist = state.playlists[index];
+            return MediaGridCard(
+              kind: MediaGridCardKind.playlist,
+              title: playlist.name,
+              subtitle: playlist.creator,
+              coverUrl: playlist.cover,
+              playCount: playlist.playCount,
+              onTap: () => context.push(
+                Uri(
+                  path: AppRoutes.playlistDetail,
+                  queryParameters: <String, String>{
+                    'id': playlist.id,
+                    'platform': playlist.platform,
+                    'title': playlist.name,
+                  },
+                ).toString(),
+              ),
+            );
+          },
         );
       },
     );

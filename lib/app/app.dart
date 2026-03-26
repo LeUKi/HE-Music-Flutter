@@ -267,7 +267,6 @@ class _StartupLoadingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -275,15 +274,6 @@ class _StartupLoadingBody extends StatelessWidget {
           width: 24,
           height: 24,
           child: CircularProgressIndicator(strokeWidth: 2.4),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          '首次进入会稍慢一些，完成后会常驻缓存。',
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            height: 1.45,
-          ),
         ),
       ],
     );

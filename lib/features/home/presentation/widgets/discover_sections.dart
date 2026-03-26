@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/config/app_config_state.dart';
 import '../../../../shared/models/he_music_models.dart';
+import '../../../../shared/layout/adaptive_media_grid_spec.dart';
 import '../../../../shared/utils/playlist_song_count_text.dart';
 import '../../../../shared/widgets/animated_skeleton.dart';
 import '../../../../shared/widgets/media_grid_card.dart';
@@ -155,18 +156,19 @@ class _SectionBlock extends StatelessWidget {
       HomeDiscoverItemType.album ||
       HomeDiscoverItemType.playlist => LayoutBuilder(
         builder: (context, constraints) {
-          const spacing = 10.0;
-          final itemWidth = (constraints.maxWidth - spacing) / 2;
+          final spec = resolveAdaptiveMediaGridSpec(
+            maxWidth: constraints.maxWidth,
+          );
           final albumItems = section.albums;
           final playlistItems = section.playlists;
           return Wrap(
-            spacing: spacing,
-            runSpacing: spacing,
+            spacing: spec.crossAxisSpacing,
+            runSpacing: spec.mainAxisSpacing,
             children:
                 (section.type == HomeDiscoverItemType.album
                         ? albumItems.map(
                             (item) => SizedBox(
-                              width: itemWidth,
+                              width: spec.itemWidth,
                               child: _DiscoverGridCard(
                                 type: section.type,
                                 title: item.name,
@@ -181,7 +183,7 @@ class _SectionBlock extends StatelessWidget {
                           )
                         : playlistItems.map(
                             (item) => SizedBox(
-                              width: itemWidth,
+                              width: spec.itemWidth,
                               child: _DiscoverGridCard(
                                 type: section.type,
                                 title: item.name,
@@ -376,15 +378,16 @@ class _GridSectionSkeleton extends StatelessWidget {
         const _SectionTitleSkeleton(),
         LayoutBuilder(
           builder: (context, constraints) {
-            const spacing = 10.0;
-            final itemWidth = (constraints.maxWidth - spacing) / 2;
+            final spec = resolveAdaptiveMediaGridSpec(
+              maxWidth: constraints.maxWidth,
+            );
             return Wrap(
-              spacing: spacing,
-              runSpacing: spacing,
+              spacing: spec.crossAxisSpacing,
+              runSpacing: spec.mainAxisSpacing,
               children: List<Widget>.generate(
-                4,
+                spec.crossAxisCount * 2,
                 (_) => SizedBox(
-                  width: itemWidth,
+                  width: spec.itemWidth,
                   child: const GridCardSkeleton(),
                 ),
               ),

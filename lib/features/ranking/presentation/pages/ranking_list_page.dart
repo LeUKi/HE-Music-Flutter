@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_config_controller.dart';
 import '../../../../app/i18n/app_i18n.dart';
 import '../../../../app/router/app_routes.dart';
+import '../../../../shared/layout/ranking_layout_spec.dart';
 import '../../../../shared/widgets/online_platform_tabs.dart';
 import '../../../../shared/widgets/plaza_loading_skeleton.dart';
 import '../../../online/domain/entities/online_platform.dart';
@@ -323,10 +324,9 @@ class _RankingRowCard extends StatelessWidget {
     final theme = Theme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 与下方网格榜单封面保持一致的尺寸算法
-        // grid: itemWidth = (width - spacing * 2) / 3
-        const spacing = 12.0;
-        final coverSide = (constraints.maxWidth - spacing * 2) / 3;
+        final rowSpec = resolveRankingRowLayoutSpec(
+          maxWidth: constraints.maxWidth,
+        );
 
         return Material(
           color: theme.cardTheme.color,
@@ -351,11 +351,11 @@ class _RankingRowCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      _Cover(url: ranking.coverUrl, side: coverSide),
+                      _Cover(url: ranking.coverUrl, side: rowSpec.coverSide),
                       const SizedBox(width: 14),
                       Expanded(
                         child: SizedBox(
-                          height: coverSide,
+                          height: rowSpec.coverSide,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,20 +404,20 @@ class _RankingGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        const spacing = 12.0;
-        final itemWidth = (width - spacing * 2) / 3;
+        final gridSpec = resolveRankingGridLayoutSpec(
+          maxWidth: constraints.maxWidth,
+        );
         return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
+          spacing: gridSpec.spacing,
+          runSpacing: gridSpec.spacing,
           children: rankings
               .map(
                 (ranking) => SizedBox(
-                  width: itemWidth,
+                  width: gridSpec.itemWidth,
                   child: _RankingGridItem(
                     ranking: ranking,
                     onTap: onTap,
-                    side: itemWidth,
+                    side: gridSpec.itemWidth,
                   ),
                 ),
               )
