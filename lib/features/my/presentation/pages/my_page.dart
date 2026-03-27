@@ -30,6 +30,7 @@ class _MyPageState extends ConsumerState<MyPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final platform = theme.platform;
     final config = ref.watch(appConfigProvider);
     final configController = ref.read(appConfigProvider.notifier);
     final state = ref.watch(myOverviewControllerProvider);
@@ -40,6 +41,8 @@ class _MyPageState extends ConsumerState<MyPage> {
     );
     final tokenSet = config.authToken != null && config.authToken!.isNotEmpty;
     final overview = state.overview;
+    final showQrScanEntry =
+        platform == TargetPlatform.android || platform == TargetPlatform.iOS;
     _syncOverviewLoading(tokenSet, state);
 
     return ListView(
@@ -56,6 +59,12 @@ class _MyPageState extends ConsumerState<MyPage> {
                 ),
               ),
             ),
+            if (showQrScanEntry)
+              IconButton(
+                tooltip: AppI18n.t(config, 'common.scan'),
+                onPressed: () => context.push(AppRoutes.loginQrScan),
+                icon: const Icon(Icons.qr_code_scanner_rounded),
+              ),
             IconButton(
               tooltip: AppI18n.t(config, 'settings.title'),
               onPressed: () => context.push(AppRoutes.settings),

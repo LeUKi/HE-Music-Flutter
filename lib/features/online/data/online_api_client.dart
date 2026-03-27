@@ -40,6 +40,91 @@ class AuthStatusResult {
   final int expireAt;
 }
 
+class QrLoginSessionResult {
+  const QrLoginSessionResult({
+    required this.sessionId,
+    required this.qrContent,
+    required this.resultToken,
+    required this.status,
+    required this.checkInterval,
+    required this.expireAt,
+  });
+
+  final String sessionId;
+  final String qrContent;
+  final String resultToken;
+  final String status;
+  final int checkInterval;
+  final int expireAt;
+}
+
+class QrLoginSessionStatusResult {
+  const QrLoginSessionStatusResult({
+    required this.sessionId,
+    required this.status,
+    required this.checkInterval,
+    required this.expireAt,
+    required this.clientName,
+    required this.userHint,
+  });
+
+  final String sessionId;
+  final String status;
+  final int checkInterval;
+  final int expireAt;
+  final String clientName;
+  final String userHint;
+}
+
+class QrLoginScanResult {
+  const QrLoginScanResult({
+    required this.sessionId,
+    required this.status,
+    required this.clientName,
+    required this.scene,
+    required this.expireAt,
+  });
+
+  final String sessionId;
+  final String status;
+  final String clientName;
+  final String scene;
+  final int expireAt;
+}
+
+class QrLoginConfirmResult {
+  const QrLoginConfirmResult({
+    required this.sessionId,
+    required this.status,
+    required this.expireAt,
+  });
+
+  final String sessionId;
+  final String status;
+  final int expireAt;
+}
+
+class QrLoginCancelResult {
+  const QrLoginCancelResult({required this.sessionId, required this.status});
+
+  final String sessionId;
+  final String status;
+}
+
+class QrLoginExchangeResult {
+  const QrLoginExchangeResult({
+    required this.sessionId,
+    required this.status,
+    required this.token,
+    required this.expireAt,
+  });
+
+  final String sessionId;
+  final String status;
+  final String token;
+  final int expireAt;
+}
+
 class OnlineCommentPageResult {
   const OnlineCommentPageResult({
     required this.list,
@@ -118,6 +203,117 @@ class OnlineApiClient {
     );
     final data = _asMap(response.data);
     return '${data['token'] ?? ''}'.trim();
+  }
+
+  Future<QrLoginSessionResult> createQrLoginSession({
+    required String clientType,
+    required String clientName,
+    required String scene,
+  }) async {
+    final response = await _dio.post(
+      '/v1/auth/qr/session',
+      data: <String, dynamic>{
+        'client_type': clientType,
+        'client_name': clientName,
+        'scene': scene,
+      },
+    );
+    final data = _asMap(response.data);
+    return QrLoginSessionResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      qrContent: '${data['qr_content'] ?? ''}'.trim(),
+      resultToken: '${data['result_token'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+      checkInterval: _asInt(data['check_interval']),
+      expireAt: _asInt(data['expire_at']),
+    );
+  }
+
+  Future<QrLoginSessionStatusResult> getQrLoginSessionStatus({
+    required String sessionId,
+  }) async {
+    final response = await _dio.get(
+      '/v1/auth/qr/status',
+      queryParameters: <String, dynamic>{'session_id': sessionId},
+    );
+    final data = _asMap(response.data);
+    return QrLoginSessionStatusResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+      checkInterval: _asInt(data['check_interval']),
+      expireAt: _asInt(data['expire_at']),
+      clientName: '${data['client_name'] ?? ''}'.trim(),
+      userHint: '${data['user_hint'] ?? ''}'.trim(),
+    );
+  }
+
+  Future<QrLoginScanResult> scanQrLoginSession({
+    required String sessionId,
+    required String challenge,
+  }) async {
+    final response = await _dio.post(
+      '/v1/auth/qr/scan',
+      data: <String, dynamic>{'session_id': sessionId, 'challenge': challenge},
+    );
+    final data = _asMap(response.data);
+    return QrLoginScanResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+      clientName: '${data['client_name'] ?? ''}'.trim(),
+      scene: '${data['scene'] ?? ''}'.trim(),
+      expireAt: _asInt(data['expire_at']),
+    );
+  }
+
+  Future<QrLoginConfirmResult> confirmQrLoginSession({
+    required String sessionId,
+    required String challenge,
+  }) async {
+    final response = await _dio.post(
+      '/v1/auth/qr/confirm',
+      data: <String, dynamic>{'session_id': sessionId, 'challenge': challenge},
+    );
+    final data = _asMap(response.data);
+    return QrLoginConfirmResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+      expireAt: _asInt(data['expire_at']),
+    );
+  }
+
+  Future<QrLoginCancelResult> cancelQrLoginSession({
+    required String sessionId,
+    required String challenge,
+  }) async {
+    final response = await _dio.post(
+      '/v1/auth/qr/cancel',
+      data: <String, dynamic>{'session_id': sessionId, 'challenge': challenge},
+    );
+    final data = _asMap(response.data);
+    return QrLoginCancelResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+    );
+  }
+
+  Future<QrLoginExchangeResult> exchangeQrLoginResult({
+    required String sessionId,
+    required String resultToken,
+  }) async {
+    final response = await _dio.post(
+      '/v1/auth/qr/result',
+      data: <String, dynamic>{
+        'session_id': sessionId,
+        'result_token': resultToken,
+      },
+    );
+    final data = _asMap(response.data);
+    return QrLoginExchangeResult(
+      sessionId: '${data['session_id'] ?? ''}'.trim(),
+      status: '${data['status'] ?? ''}'.trim(),
+      token: '${data['token'] ?? ''}'.trim(),
+      expireAt: _asInt(data['expire_at']),
+    );
   }
 
   Future<Map<String, dynamic>> fetchProfile() async {

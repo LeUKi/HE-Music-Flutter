@@ -73,10 +73,9 @@ class MusicDetailSliverAppBar extends StatelessWidget {
           final collapsedOverlayStyle = theme.brightness == Brightness.dark
               ? SystemUiOverlayStyle.light
               : SystemUiOverlayStyle.dark;
-          final overlayStyle = (fade > 0.58
-                  ? collapsedOverlayStyle
-                  : SystemUiOverlayStyle.light)
-              .copyWith(statusBarColor: Colors.transparent);
+          final overlayStyle =
+              (fade > 0.58 ? collapsedOverlayStyle : SystemUiOverlayStyle.light)
+                  .copyWith(statusBarColor: Colors.transparent);
           return AnnotatedRegion<SystemUiOverlayStyle>(
             value: overlayStyle,
             child: Stack(

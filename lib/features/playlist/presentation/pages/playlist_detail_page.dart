@@ -119,7 +119,9 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
       return DetailErrorBody(message: state.errorMessage!, onRetry: onRetry);
     }
     return Center(
-      child: Text(AppI18n.t(ref.read(appConfigProvider), 'detail.no_playlist_content')),
+      child: Text(
+        AppI18n.t(ref.read(appConfigProvider), 'detail.no_playlist_content'),
+      ),
     );
   }
 

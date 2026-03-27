@@ -1,6 +1,11 @@
 abstract final class AppRoutes {
   static const home = '/';
+  static String get homeMy =>
+      Uri(path: home, queryParameters: const <String, String>{'tab': 'my'})
+          .toString();
   static const login = '/login';
+  static const loginQrScan = '/login/qr-scan';
+  static const loginQrConfirm = '/login/qr-confirm';
   static const captcha = '/captcha';
   static const library = '/library';
   static const player = '/player';

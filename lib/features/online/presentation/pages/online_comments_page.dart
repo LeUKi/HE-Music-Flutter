@@ -16,7 +16,10 @@ enum _CommentTabType { hot, newest }
 extension on _CommentTabType {
   String label(String localeCode) {
     return switch (this) {
-      _CommentTabType.hot => AppI18n.tByLocaleCode(localeCode, 'comments.tab.hot'),
+      _CommentTabType.hot => AppI18n.tByLocaleCode(
+        localeCode,
+        'comments.tab.hot',
+      ),
       _CommentTabType.newest => AppI18n.tByLocaleCode(
         localeCode,
         'comments.tab.newest',

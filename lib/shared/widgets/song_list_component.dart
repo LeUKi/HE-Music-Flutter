@@ -98,9 +98,7 @@ class _SongListComponentState extends State<SongListComponent> {
     if (widget.loadingMore) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 12),
-        child: Center(
-          child: SkeletonBox(width: 96, height: 12, radius: 999),
-        ),
+        child: Center(child: SkeletonBox(width: 96, height: 12, radius: 999)),
       );
     }
     if (!widget.hasMore) {
@@ -151,7 +149,11 @@ class _SongSkeletonItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const SkeletonBox(width: double.infinity, height: 13, radius: 4),
+                const SkeletonBox(
+                  width: double.infinity,
+                  height: 13,
+                  radius: 4,
+                ),
                 const SizedBox(height: 6),
                 const SkeletonBox(width: 180, height: 11, radius: 4),
                 const SizedBox(height: 6),

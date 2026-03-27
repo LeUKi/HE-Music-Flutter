@@ -135,13 +135,11 @@ class ArtistVideosLoadingView extends StatelessWidget {
   }
 }
 
-Widget _emptyBuilder(BuildContext context, int index) => const SizedBox.shrink();
+Widget _emptyBuilder(BuildContext context, int index) =>
+    const SizedBox.shrink();
 
 class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  const _FixedHeaderDelegate({
-    required this.child,
-    required this.height,
-  });
+  const _FixedHeaderDelegate({required this.child, required this.height});
 
   final Widget child;
   final double height;
@@ -354,11 +352,17 @@ class _ArtistTabBarSkeleton extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(12, 10, 12, 8),
         child: Row(
           children: <Widget>[
-            Expanded(child: SkeletonBox(width: double.infinity, height: 16, radius: 8)),
+            Expanded(
+              child: SkeletonBox(width: double.infinity, height: 16, radius: 8),
+            ),
             SizedBox(width: 16),
-            Expanded(child: SkeletonBox(width: double.infinity, height: 16, radius: 8)),
+            Expanded(
+              child: SkeletonBox(width: double.infinity, height: 16, radius: 8),
+            ),
             SizedBox(width: 16),
-            Expanded(child: SkeletonBox(width: double.infinity, height: 16, radius: 8)),
+            Expanded(
+              child: SkeletonBox(width: double.infinity, height: 16, radius: 8),
+            ),
           ],
         ),
       ),
@@ -444,7 +448,11 @@ class _ArtistVideoSkeleton extends StatelessWidget {
       children: <Widget>[
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: SkeletonBox(width: double.infinity, height: double.infinity, radius: 16),
+          child: SkeletonBox(
+            width: double.infinity,
+            height: double.infinity,
+            radius: 16,
+          ),
         ),
         SizedBox(height: 10),
         SkeletonBox(width: double.infinity, height: 14, radius: 7),

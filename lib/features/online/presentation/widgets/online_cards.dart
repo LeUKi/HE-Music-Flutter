@@ -163,14 +163,20 @@ class LoginCard extends StatelessWidget {
           TextField(
             controller: usernameController,
             decoration: InputDecoration(
-              labelText: AppI18n.tByLocaleCode(localeCode, 'online.login.username'),
+              labelText: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.login.username',
+              ),
             ),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: passwordController,
             decoration: InputDecoration(
-              labelText: AppI18n.tByLocaleCode(localeCode, 'online.login.password'),
+              labelText: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.login.password',
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -180,7 +186,9 @@ class LoginCard extends StatelessWidget {
             children: <Widget>[
               FilledButton(
                 onPressed: onLogin,
-                child: Text(AppI18n.tByLocaleCode(localeCode, 'online.login.submit')),
+                child: Text(
+                  AppI18n.tByLocaleCode(localeCode, 'online.login.submit'),
+                ),
               ),
               OutlinedButton(
                 onPressed: onFetchProfile,
@@ -217,7 +225,10 @@ class QuickActionsCard extends StatelessWidget {
           Expanded(
             child: _QuickActionTile(
               icon: Icons.search_rounded,
-              title: AppI18n.tByLocaleCode(localeCode, 'online.quick.search.title'),
+              title: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.quick.search.title',
+              ),
               subtitle: AppI18n.tByLocaleCode(
                 localeCode,
                 'online.quick.search.subtitle',
@@ -229,7 +240,10 @@ class QuickActionsCard extends StatelessWidget {
           Expanded(
             child: _QuickActionTile(
               icon: Icons.account_circle_rounded,
-              title: AppI18n.tByLocaleCode(localeCode, 'online.quick.profile.title'),
+              title: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.quick.profile.title',
+              ),
               subtitle: AppI18n.tByLocaleCode(
                 localeCode,
                 'online.quick.profile.subtitle',
@@ -303,7 +317,10 @@ class PlaylistCard extends StatelessWidget {
           TextField(
             controller: playlistNameController,
             decoration: InputDecoration(
-              labelText: AppI18n.tByLocaleCode(localeCode, 'online.playlist.name'),
+              labelText: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.playlist.name',
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -317,7 +334,10 @@ class PlaylistCard extends StatelessWidget {
           TextField(
             controller: playlistFavoriteIdController,
             decoration: InputDecoration(
-              labelText: AppI18n.tByLocaleCode(localeCode, 'online.playlist.id'),
+              labelText: AppI18n.tByLocaleCode(
+                localeCode,
+                'online.playlist.id',
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -334,7 +354,10 @@ class PlaylistCard extends StatelessWidget {
               OutlinedButton(
                 onPressed: onUnfavorite,
                 child: Text(
-                  AppI18n.tByLocaleCode(localeCode, 'online.playlist.unfavorite'),
+                  AppI18n.tByLocaleCode(
+                    localeCode,
+                    'online.playlist.unfavorite',
+                  ),
                 ),
               ),
             ],

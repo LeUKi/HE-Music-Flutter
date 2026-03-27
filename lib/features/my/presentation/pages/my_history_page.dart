@@ -71,9 +71,7 @@ class MyHistoryPage extends ConsumerWidget {
       return;
     }
     final track = _toTrack(items[startIndex]);
-    await ref
-        .read(playerControllerProvider.notifier)
-        .insertNextAndPlay(track);
+    await ref.read(playerControllerProvider.notifier).insertNextAndPlay(track);
   }
 
   PlayerTrack _toTrack(PlayerHistoryItem item) {

@@ -41,6 +41,21 @@ Future<HeAudioHandlerRuntimeConfig> loadHeAudioHandlerRuntimeConfig({
   );
 }
 
+@visibleForTesting
+bool shouldRefreshRemotePlaybackUrl(AudioTrack track) {
+  final localPath = track.path?.trim() ?? '';
+  if (localPath.isNotEmpty) {
+    return false;
+  }
+  final sourceUrl = track.url.trim();
+  final parsedUrl = Uri.tryParse(sourceUrl);
+  if (parsedUrl != null && parsedUrl.scheme == 'file') {
+    return false;
+  }
+  final platform = track.platform?.trim() ?? '';
+  return platform.isNotEmpty;
+}
+
 class HeAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   HeAudioHandler() : _player = createHeAudioPlayer() {
     _player.playerStateStream.listen((_) {
@@ -295,25 +310,6 @@ class HeAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   Future<AudioTrack> _resolveTrack(AudioTrack track) async {
     await _ensureConfigRecovered();
-    if (track.url.trim().isNotEmpty) {
-      return track;
-    }
-    final matchedQuality = _resolvePreferredLink(track.links);
-    final directUrl = matchedQuality?.url.trim() ?? '';
-    if (directUrl.isNotEmpty) {
-      return AudioTrack(
-        id: track.id,
-        title: track.title,
-        url: directUrl,
-        path: track.path,
-        duration: track.duration,
-        links: track.links,
-        artist: track.artist,
-        album: track.album,
-        artworkUrl: track.artworkUrl,
-        platform: track.platform,
-      );
-    }
     final localPath = track.path?.trim() ?? '';
     if (localPath.isNotEmpty) {
       return AudioTrack(
@@ -329,6 +325,29 @@ class HeAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
         platform: track.platform,
       );
     }
+    if (!shouldRefreshRemotePlaybackUrl(track)) {
+      if (track.url.trim().isNotEmpty) {
+        return track;
+      }
+      final matchedDirect =
+          _resolvePreferredLink(track.links)?.url.trim() ?? '';
+      if (matchedDirect.isNotEmpty) {
+        return AudioTrack(
+          id: track.id,
+          title: track.title,
+          url: matchedDirect,
+          path: track.path,
+          duration: track.duration,
+          links: track.links,
+          artist: track.artist,
+          album: track.album,
+          artworkUrl: track.artworkUrl,
+          platform: track.platform,
+        );
+      }
+      return track;
+    }
+    final matchedQuality = _resolvePreferredLink(track.links);
     final platform = track.platform?.trim() ?? '';
     if (platform.isEmpty) {
       return track;

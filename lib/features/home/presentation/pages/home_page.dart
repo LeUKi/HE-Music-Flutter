@@ -12,9 +12,12 @@ import '../providers/home_discover_providers.dart';
 import '../widgets/discover_home_tab.dart';
 
 const _tabHome = 0;
+const _tabMy = 1;
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.initialTab});
+
+  final String? initialTab;
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -26,6 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    _tabIndex = widget.initialTab == 'my' ? _tabMy : _tabHome;
     Future.microtask(() {
       ref.read(playerControllerProvider.notifier).initialize();
       ref.read(homeDiscoverControllerProvider.notifier).initialize();

@@ -7,6 +7,8 @@ import '../../features/artist/presentation/pages/artist_detail_page.dart';
 import '../../features/artist/presentation/pages/artist_plaza_page.dart';
 import '../../features/auth/presentation/pages/captcha_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/qr_login_confirm_page.dart';
+import '../../features/auth/presentation/pages/qr_login_scan_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/music_library/presentation/pages/local_library_page.dart';
 import '../../features/my/presentation/pages/my_collection_page.dart';
@@ -36,6 +38,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             LoginPage(redirectLocation: _readOptionalQuery(state, 'redirect')),
       ),
       GoRoute(
+        path: AppRoutes.loginQrScan,
+        builder: (context, state) => const QrLoginScanPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.loginQrConfirm,
+        builder: (context, state) => const QrLoginConfirmPage(),
+      ),
+      GoRoute(
         path: AppRoutes.captcha,
         builder: (context, state) => CaptchaPage(
           scene: _readQuery(state, 'scene'),
@@ -44,7 +54,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.home,
-        builder: (context, state) => const HomePage(),
+        builder: (context, state) =>
+            HomePage(initialTab: _readOptionalQuery(state, 'tab')),
       ),
       GoRoute(
         path: AppRoutes.player,

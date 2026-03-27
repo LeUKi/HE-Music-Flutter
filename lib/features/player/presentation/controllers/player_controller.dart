@@ -1412,10 +1412,7 @@ class PlayerController extends Notifier<PlayerPlaybackState> {
     return currentQueue.isNotEmpty;
   }
 
-  bool _isSameQueueSource(
-    PlayerQueueSource? current,
-    PlayerQueueSource? next,
-  ) {
+  bool _isSameQueueSource(PlayerQueueSource? current, PlayerQueueSource? next) {
     if (current == null || next == null) {
       return false;
     }

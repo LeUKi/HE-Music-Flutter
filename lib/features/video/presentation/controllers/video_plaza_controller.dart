@@ -162,10 +162,7 @@ class VideoPlazaController extends AutoDisposeNotifier<VideoPlazaState> {
         pageIndex: currentPageIndex + 1,
       );
     } catch (error) {
-      state = state.copyWith(
-        loadingMore: false,
-        videosErrorMessage: '$error',
-      );
+      state = state.copyWith(loadingMore: false, videosErrorMessage: '$error');
     }
   }
 

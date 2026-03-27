@@ -141,9 +141,9 @@ class _ArtistPlazaPageState extends ConsumerState<ArtistPlazaPage> {
       if (!mounted) {
         return;
       }
-      ref.read(artistPlazaControllerProvider.notifier).initialize(
-            initialPlatformId,
-          );
+      ref
+          .read(artistPlazaControllerProvider.notifier)
+          .initialize(initialPlatformId);
     });
   }
 
@@ -329,38 +329,43 @@ class _ArtistFilterRow extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: group.options.map((option) {
-            final selected = option.value == selectedValue;
-            return Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: ChoiceChip(
-                label: Text(option.label),
-                showCheckmark: false,
-                selected: selected,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                selectedColor: colorScheme.primary.withValues(alpha: 0.10),
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                side: BorderSide(
-                  width: 0.9,
-                  color: selected
-                      ? colorScheme.primary.withValues(alpha: 0.30)
-                      : colorScheme.outlineVariant,
-                ),
-                labelStyle: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  color: selected
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 0),
-                visualDensity: const VisualDensity(
-                  horizontal: -2,
-                  vertical: -3,
-                ),
-                onSelected: (_) => onSelect(option.value),
-              ),
-            );
-          }).toList(growable: false),
+          children: group.options
+              .map((option) {
+                final selected = option.value == selectedValue;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    label: Text(option.label),
+                    showCheckmark: false,
+                    selected: selected,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    selectedColor: colorScheme.primary.withValues(alpha: 0.10),
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    side: BorderSide(
+                      width: 0.9,
+                      color: selected
+                          ? colorScheme.primary.withValues(alpha: 0.30)
+                          : colorScheme.outlineVariant,
+                    ),
+                    labelStyle: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 2,
+                      vertical: 0,
+                    ),
+                    visualDensity: const VisualDensity(
+                      horizontal: -2,
+                      vertical: -3,
+                    ),
+                    onSelected: (_) => onSelect(option.value),
+                  ),
+                );
+              })
+              .toList(growable: false),
         ),
       ),
     );
@@ -399,8 +404,8 @@ class _PlatformsErrorView extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
+                color: Theme.of(context).hintColor,
+              ),
             ),
           ),
           TextButton(onPressed: onRetry, child: const Text('重试')),
@@ -446,8 +451,8 @@ class _ErrorView extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
+                color: Theme.of(context).hintColor,
+              ),
             ),
             const SizedBox(height: 12),
             FilledButton.tonal(onPressed: onRetry, child: const Text('重试')),
@@ -473,9 +478,9 @@ class _LoadMoreRetryCard extends StatelessWidget {
           Text(
             message?.trim().isNotEmpty == true ? message!.trim() : '加载失败',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).hintColor,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
           ),
           const SizedBox(height: 8),
           FilledButton.tonal(onPressed: onRetry, child: const Text('重试')),

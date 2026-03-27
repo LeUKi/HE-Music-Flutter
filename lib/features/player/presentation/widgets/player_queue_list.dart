@@ -96,8 +96,7 @@ class _PlayerQueueListState extends State<PlayerQueueList> {
           tintColor: theme.colorScheme.surface.withValues(alpha: 0.52),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           child: Text(
-            widget.emptyText ??
-                AppI18n.t(widget.config, 'player.queue.empty'),
+            widget.emptyText ?? AppI18n.t(widget.config, 'player.queue.empty'),
           ),
         ),
       );
@@ -127,7 +126,9 @@ class _PlayerQueueListState extends State<PlayerQueueList> {
     final itemKey = _itemKeys.putIfAbsent(itemIdentity, GlobalKey.new);
     return Padding(
       key: itemKey,
-      padding: EdgeInsets.only(bottom: index == widget.queue.length - 1 ? 0 : 2),
+      padding: EdgeInsets.only(
+        bottom: index == widget.queue.length - 1 ? 0 : 2,
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -135,12 +136,7 @@ class _PlayerQueueListState extends State<PlayerQueueList> {
           onTap: () => widget.onPlayAt(index),
           child: Container(
             constraints: const BoxConstraints(minHeight: 54),
-            padding: EdgeInsets.fromLTRB(
-              8,
-              6,
-              widget.editable ? 4 : 8,
-              6,
-            ),
+            padding: EdgeInsets.fromLTRB(8, 6, widget.editable ? 4 : 8, 6),
             decoration: BoxDecoration(
               color: isCurrent
                   ? theme.colorScheme.primary.withValues(alpha: 0.10)
@@ -178,7 +174,9 @@ class _PlayerQueueListState extends State<PlayerQueueList> {
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isCurrent
-                              ? theme.colorScheme.primary.withValues(alpha: 0.82)
+                              ? theme.colorScheme.primary.withValues(
+                                  alpha: 0.82,
+                                )
                               : theme.colorScheme.onSurfaceVariant,
                         ),
                       ),

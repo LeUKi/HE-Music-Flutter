@@ -33,7 +33,9 @@ enum AppOnlineAudioQuality {
 
   static String autoDescription({String? lastSelectedQualityName}) {
     final lastSelected = lastSelectedQualityName?.trim() ?? '';
-    final fallbackText = autoFallbackOrder.map((item) => item.value).join(' > ');
+    final fallbackText = autoFallbackOrder
+        .map((item) => item.value)
+        .join(' > ');
     if (lastSelected.isEmpty) {
       return '自动按优先级选择：$fallbackText';
     }

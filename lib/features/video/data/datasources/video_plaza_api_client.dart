@@ -24,10 +24,8 @@ class VideoPlazaApiClient {
     }
     return filtersRaw
         .map(
-          (item) => FilterInfo.fromMap(
-            _asMap(item),
-            fallbackPlatform: platform,
-          ),
+          (item) =>
+              FilterInfo.fromMap(_asMap(item), fallbackPlatform: platform),
         )
         .toList(growable: false);
   }

@@ -32,7 +32,8 @@ class PlayerQueueDataSource {
       'play_mode': playMode.name,
       'queue': queue.map(_trackToMap).toList(growable: false),
       'source': source?.toMap(),
-      'previous_snapshot': previousSnapshot == null || previousSnapshot.queue.isEmpty
+      'previous_snapshot':
+          previousSnapshot == null || previousSnapshot.queue.isEmpty
           ? null
           : _snapshotToMap(previousSnapshot),
     };
@@ -52,7 +53,9 @@ class PlayerQueueDataSource {
       }
       final raw = decoded.map((key, value) => MapEntry('$key', value));
       final queue = _trackList(raw['queue']);
-      final previousSnapshot = previousSnapshotFromValue(raw['previous_snapshot']);
+      final previousSnapshot = previousSnapshotFromValue(
+        raw['previous_snapshot'],
+      );
       if (queue.isEmpty && previousSnapshot == null) {
         return null;
       }

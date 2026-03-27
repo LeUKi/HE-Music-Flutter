@@ -103,8 +103,8 @@ class _LyricPanelState extends ConsumerState<LyricPanel> {
         color: Colors.white,
         fontWeight: FontWeight.w600,
       ),
-      translationStyle:TextStyle(fontSize: 14, color: Colors.white70),
-      lineGap:16,
+      translationStyle: TextStyle(fontSize: 14, color: Colors.white70),
+      lineGap: 16,
       translationLineGap: 4,
       translationActiveColor: Colors.white,
       activeHighlightGradient: const LinearGradient(

@@ -36,8 +36,7 @@ class _AnimatedSkeletonState extends State<AnimatedSkeleton>
         widget.baseColor ??
         scheme.surfaceContainerHighest.withValues(alpha: 0.68);
     final highlightColor =
-        widget.highlightColor ??
-        Color.lerp(baseColor, Colors.white, 0.42)!;
+        widget.highlightColor ?? Color.lerp(baseColor, Colors.white, 0.42)!;
     return AnimatedBuilder(
       animation: _controller,
       child: widget.child,

@@ -78,11 +78,9 @@ class DownloadPage extends ConsumerWidget {
       }
       _showMessage(
         context,
-        AppI18n.format(
-          config,
-          'download.added',
-          <String, String>{'title': track.title},
-        ),
+        AppI18n.format(config, 'download.added', <String, String>{
+          'title': track.title,
+        }),
       );
     } on AppException catch (error) {
       if (!context.mounted) {
@@ -150,7 +148,10 @@ class _DownloadToolbar extends StatelessWidget {
                   onPressed: onDownloadCurrent,
                   icon: const Icon(Icons.download_rounded),
                   label: Text(
-                    AppI18n.tByLocaleCode(localeCode, 'download.action.current'),
+                    AppI18n.tByLocaleCode(
+                      localeCode,
+                      'download.action.current',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

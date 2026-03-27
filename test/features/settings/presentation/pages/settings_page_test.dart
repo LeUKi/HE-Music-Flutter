@@ -12,7 +12,9 @@ void main() {
     expect(find.text('关于'), findsOneWidget);
   });
 
-  testWidgets('settings page places about entry below monochrome', (tester) async {
+  testWidgets('settings page places about entry below monochrome', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: SettingsPage())),
     );

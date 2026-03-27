@@ -122,7 +122,10 @@ class _UserPlaylistDetailPageState
     }
     return Center(
       child: Text(
-        AppI18n.t(ref.read(appConfigProvider), 'detail.no_user_playlist_content'),
+        AppI18n.t(
+          ref.read(appConfigProvider),
+          'detail.no_user_playlist_content',
+        ),
       ),
     );
   }
@@ -297,10 +300,7 @@ class _UserPlaylistDetailPageState
               ListTile(
                 leading: const Icon(Icons.edit_outlined),
                 title: Text(
-                  AppI18n.t(
-                    ref.read(appConfigProvider),
-                    'user_playlist.edit',
-                  ),
+                  AppI18n.t(ref.read(appConfigProvider), 'user_playlist.edit'),
                 ),
                 onTap: () {
                   Navigator.of(sheetContext).pop();

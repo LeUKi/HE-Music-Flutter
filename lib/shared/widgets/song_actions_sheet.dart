@@ -40,7 +40,9 @@ Future<void> showSongActionsSheet({
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.play_arrow_rounded),
-                title: Text(AppI18n.tByLocaleCode(localeCode, 'song.action.play')),
+                title: Text(
+                  AppI18n.tByLocaleCode(localeCode, 'song.action.play'),
+                ),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   onPlay();
@@ -140,7 +142,10 @@ Future<void> showSongActionsSheet({
               ListTile(
                 leading: const Icon(Icons.search_rounded),
                 title: Text(
-                  AppI18n.tByLocaleCode(localeCode, 'player.action.search_same'),
+                  AppI18n.tByLocaleCode(
+                    localeCode,
+                    'player.action.search_same',
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(sheetContext).pop();

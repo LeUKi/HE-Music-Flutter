@@ -162,10 +162,7 @@ class ArtistPlazaController extends AutoDisposeNotifier<ArtistPlazaState> {
         pageIndex: currentPageIndex + 1,
       );
     } catch (error) {
-      state = state.copyWith(
-        loadingMore: false,
-        artistsErrorMessage: '$error',
-      );
+      state = state.copyWith(loadingMore: false, artistsErrorMessage: '$error');
     }
   }
 

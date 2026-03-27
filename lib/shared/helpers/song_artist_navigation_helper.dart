@@ -14,7 +14,10 @@ Future<void> openSongArtistSelection({
   final availableArtists = _normalizeArtists(artists);
   final localeCode = Localizations.localeOf(context).languageCode;
   if (availableArtists.isEmpty) {
-    final message = AppI18n.tByLocaleCode(localeCode, 'song.artist.unavailable');
+    final message = AppI18n.tByLocaleCode(
+      localeCode,
+      'song.artist.unavailable',
+    );
     if (onError != null) {
       onError(message);
       return;
@@ -46,7 +49,9 @@ Future<void> openSongArtistSelection({
             shrinkWrap: true,
             children: <Widget>[
               ListTile(
-                title: Text(AppI18n.tByLocaleCode(localeCode, 'song.artist.select')),
+                title: Text(
+                  AppI18n.tByLocaleCode(localeCode, 'song.artist.select'),
+                ),
                 subtitle: Text(
                   AppI18n.formatByLocaleCode(
                     localeCode,

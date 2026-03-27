@@ -23,6 +23,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('我的'), findsOneWidget);
+    expect(find.byTooltip('扫描'), findsOneWidget);
     expect(find.byTooltip('设置'), findsOneWidget);
     expect(find.text('播放历史'), findsOneWidget);
     expect(find.text('本地歌曲'), findsOneWidget);
@@ -39,6 +40,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('My'), findsOneWidget);
+    expect(find.byTooltip('Scan'), findsOneWidget);
     expect(find.byTooltip('Settings'), findsOneWidget);
     expect(find.text('Play History'), findsOneWidget);
     expect(find.text('Local Songs'), findsOneWidget);
@@ -66,7 +68,10 @@ Widget _buildTestApp({required String localeCode}) {
         (ref) async => const <MyFavoriteItem>[],
       ),
     ],
-    child: const MaterialApp(home: Scaffold(body: MyPage())),
+    child: MaterialApp(
+      theme: ThemeData(platform: TargetPlatform.android),
+      home: const Scaffold(body: MyPage()),
+    ),
   );
 }
 

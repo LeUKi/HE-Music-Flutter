@@ -200,10 +200,11 @@ final searchDefaultPlaceholderProvider =
       SearchDefaultPlaceholderState
     >(SearchDefaultPlaceholderController.new);
 
-final searchHotKeywordsCacheProvider = NotifierProvider<
-  SearchHotKeywordsCacheController,
-  Map<String, SearchHotKeywordsCacheEntry>
->(SearchHotKeywordsCacheController.new);
+final searchHotKeywordsCacheProvider =
+    NotifierProvider<
+      SearchHotKeywordsCacheController,
+      Map<String, SearchHotKeywordsCacheEntry>
+    >(SearchHotKeywordsCacheController.new);
 
 class OnlinePlatformsController extends AsyncNotifier<List<OnlinePlatform>> {
   bool _loading = false;

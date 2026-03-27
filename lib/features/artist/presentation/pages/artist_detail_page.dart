@@ -220,9 +220,24 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage>
                     unselectedLabelStyle: Theme.of(context).textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.w600),
                     tabs: <Tab>[
-                      Tab(text: AppI18n.t(ref.read(appConfigProvider), 'artist.tab.song')),
-                      Tab(text: AppI18n.t(ref.read(appConfigProvider), 'artist.tab.album')),
-                      Tab(text: AppI18n.t(ref.read(appConfigProvider), 'artist.tab.video')),
+                      Tab(
+                        text: AppI18n.t(
+                          ref.read(appConfigProvider),
+                          'artist.tab.song',
+                        ),
+                      ),
+                      Tab(
+                        text: AppI18n.t(
+                          ref.read(appConfigProvider),
+                          'artist.tab.album',
+                        ),
+                      ),
+                      Tab(
+                        text: AppI18n.t(
+                          ref.read(appConfigProvider),
+                          'artist.tab.video',
+                        ),
+                      ),
                     ],
                   ),
                 ),

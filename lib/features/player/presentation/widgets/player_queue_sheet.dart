@@ -74,28 +74,36 @@ class _PlayerQueueSheetState extends ConsumerState<PlayerQueueSheet>
                       overlayColor: WidgetStateProperty.all(Colors.transparent),
                       labelStyle: Theme.of(context).textTheme.titleSmall
                           ?.copyWith(fontWeight: FontWeight.w800),
-                      unselectedLabelStyle: Theme.of(context).textTheme.titleSmall
+                      unselectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .titleSmall
                           ?.copyWith(fontWeight: FontWeight.w600),
                       tabs: <Widget>[
                         _QueueTabLabel(
                           title: AppI18n.t(config, 'player.queue.current'),
                           count: queue.length,
                           source: playbackState.queueSource,
-                          onOpenSource: playbackState.queueSource == null ||
+                          onOpenSource:
+                              playbackState.queueSource == null ||
                                   !playbackState.queueSource!.isValid
                               ? null
-                              : () =>
-                                  _openSource(context, playbackState.queueSource!),
+                              : () => _openSource(
+                                  context,
+                                  playbackState.queueSource!,
+                                ),
                         ),
                         _QueueTabLabel(
                           title: AppI18n.t(config, 'player.queue.previous'),
                           count: previousSnapshot?.queue.length ?? 0,
                           source: previousSnapshot?.source,
-                          onOpenSource: previousSnapshot?.source == null ||
+                          onOpenSource:
+                              previousSnapshot?.source == null ||
                                   !previousSnapshot!.source!.isValid
                               ? null
-                              : () =>
-                                  _openSource(context, previousSnapshot.source!),
+                              : () => _openSource(
+                                  context,
+                                  previousSnapshot.source!,
+                                ),
                         ),
                       ],
                     ),
@@ -135,7 +143,10 @@ class _PlayerQueueSheetState extends ConsumerState<PlayerQueueSheet>
                       currentIndex: previousSnapshot?.currentIndex ?? 0,
                       editable: false,
                       highlightCurrent: false,
-                      emptyText: AppI18n.t(config, 'player.queue.previous.empty'),
+                      emptyText: AppI18n.t(
+                        config,
+                        'player.queue.previous.empty',
+                      ),
                       onPlayAt: (index) {
                         Navigator.of(context).pop();
                         controller.swapToPreviousQueue(startIndex: index);
