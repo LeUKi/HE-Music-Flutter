@@ -1,20 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/app_message_service.dart';
 import '../../../../app/config/app_config_controller.dart';
+import '../../../../app/config/app_config_state.dart';
 import '../../../../app/i18n/app_i18n.dart';
 import '../../../../app/router/app_routes.dart';
 import '../../../../core/network/network_error_message.dart';
+import '../../../../shared/helpers/current_track_helper.dart';
+import '../../../../shared/helpers/platform_label_helper.dart';
+import '../../../../shared/models/he_music_models.dart';
 import '../../../../shared/utils/favorite_song_key.dart';
+import '../../../../shared/widgets/online_song_list_item.dart';
 import '../../../player/domain/entities/player_history_item.dart';
 import '../../../player/domain/entities/player_track.dart';
 import '../../../player/presentation/providers/player_providers.dart';
 import '../../../player/presentation/widgets/mini_player_bar.dart';
+import '../../../online/domain/entities/online_platform.dart';
 import '../../../online/presentation/providers/online_providers.dart';
 import '../../../../shared/widgets/song_list_component.dart';
-import '../../../../shared/widgets/song_list_item.dart';
+import '../../../../shared/widgets/song_actions_sheet.dart';
 import '../providers/favorite_song_status_providers.dart';
 import '../providers/my_history_providers.dart';
 
@@ -104,14 +113,26 @@ class _HistoryList extends ConsumerWidget {
     if (items.isEmpty) {
       return Center(child: Text(emptyText));
     }
+    final currentTrack = ref.watch(
+      playerControllerProvider.select((state) => state.currentTrack),
+    );
+    final config = ref.watch(appConfigProvider);
+    final platforms =
+        ref.watch(onlinePlatformsProvider).valueOrNull ??
+        const <OnlinePlatform>[];
     return SongListComponent(
       itemCount: items.length,
       enablePaging: false,
       itemBuilder: (context, index) {
         final item = items[index];
+        final song = _toSongInfo(item);
+        final coverUrl = _cover(item.artworkUrl);
         final songId = item.id.trim();
         final platform = item.platform?.trim() ?? '';
-        final canToggleFavorite = songId.isNotEmpty && platform.isNotEmpty;
+        final canToggleFavorite =
+            songId.isNotEmpty &&
+            platform.isNotEmpty &&
+            platform.toLowerCase() != 'local';
         final isLiked = canToggleFavorite
             ? ref.watch(
                 favoriteSongStatusProvider.select(
@@ -121,14 +142,11 @@ class _HistoryList extends ConsumerWidget {
                 ),
               )
             : false;
-        return SongListItem(
-          data: SongListItemData(
-            title: item.title.isEmpty ? item.id : item.title,
-            artistAlbumText: item.artist.isEmpty ? '-' : item.artist,
-            subtitleText: _playedText(item.playedAt),
-            coverUrl: _cover(item.artworkUrl),
-            tags: const <String>['历史'],
-          ),
+        return OnlineSongListItem(
+          song: song,
+          coverUrl: coverUrl,
+          subtitleText: _playedText(item.playedAt),
+          isCurrent: isCurrentSongTrack(currentTrack, song),
           isLiked: isLiked,
           onTap: () => onTap(index),
           onLikeTap: canToggleFavorite
@@ -139,9 +157,47 @@ class _HistoryList extends ConsumerWidget {
                   liked: isLiked,
                 )
               : null,
-          onMoreTap: () => _showTodo(context, item.url),
+          onMoreTap: () => _showSongActions(
+            context: context,
+            ref: ref,
+            config: config,
+            platforms: platforms,
+            item: item,
+            song: song,
+            coverUrl: coverUrl,
+          ),
         );
       },
+    );
+  }
+
+  SongInfo _toSongInfo(PlayerHistoryItem item) {
+    final artistNames = item.artist
+        .split(RegExp(r'\s*/\s*'))
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty && value != '-')
+        .toList(growable: false);
+    return SongInfo(
+      name: item.title.isEmpty ? item.id : item.title,
+      subtitle: '',
+      id: item.id,
+      duration: 0,
+      mvId: '',
+      album: item.album.trim().isEmpty
+          ? null
+          : SongInfoAlbumInfo(name: item.album.trim(), id: ''),
+      artists: artistNames
+          .map((name) => SongInfoArtistInfo(id: '', name: name))
+          .toList(growable: false),
+      links: const <LinkInfo>[],
+      platform: item.platform?.trim() ?? '',
+      cover: item.artworkUrl,
+      sublist: const <SongInfo>[],
+      originalType: 0,
+      path: null,
+      size: null,
+      quality: null,
+      alias: null,
     );
   }
 
@@ -158,10 +214,205 @@ class _HistoryList extends ConsumerWidget {
     return '最近播放：${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  void _showTodo(BuildContext context, String message) {
+  Future<void> _showSongActions({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppConfigState config,
+    required List<OnlinePlatform> platforms,
+    required PlayerHistoryItem item,
+    required SongInfo song,
+    required String? coverUrl,
+  }) {
+    final platform = item.platform?.trim() ?? '';
+    final isOnline = platform.isNotEmpty && platform.toLowerCase() != 'local';
+    final platformLabel = resolvePlatformLabel(platform, platforms: platforms);
+    return showSongActionsSheet(
+      context: context,
+      coverUrl: coverUrl,
+      title: song.title,
+      subtitle: song.artist,
+      hasMv: false,
+      sourceLabel: AppI18n.format(config, 'song.source', <String, String>{
+        'platform': platformLabel.isEmpty ? '-' : platformLabel,
+      }),
+      onPlay: () => unawaited(_playNow(ref: ref, item: item)),
+      onPlayNext: () => unawaited(_insertNext(ref: ref, item: item)),
+      onAddToPlaylist: () => unawaited(_appendToQueue(ref: ref, item: item)),
+      onWatchMv: () {},
+      onViewComment: isOnline
+          ? () => _openSongComments(
+              context: context,
+              ref: ref,
+              songId: item.id,
+              platformId: platform,
+              title: song.title,
+            )
+          : null,
+      onCopySongName: () => unawaited(
+        _copyText(
+          context: context,
+          value: song.title,
+          success: AppI18n.t(config, 'player.copy.name_done'),
+        ),
+      ),
+      onCopySongShareLink: isOnline
+          ? () => unawaited(
+              _copyText(
+                context: context,
+                value: 'https://y.wjhe.top/song/$platform/${item.id}',
+                success: AppI18n.t(config, 'player.copy.share_done'),
+              ),
+            )
+          : null,
+      onSearchSameName: isOnline
+          ? () => _openSongSearch(
+              context: context,
+              platformId: platform,
+              keyword: song.title,
+            )
+          : null,
+      onCopySongId: () => unawaited(
+        _copyText(
+          context: context,
+          value: item.id,
+          success: AppI18n.t(config, 'player.copy.id_done'),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _playNow({
+    required WidgetRef ref,
+    required PlayerHistoryItem item,
+  }) async {
+    await ref
+        .read(playerControllerProvider.notifier)
+        .insertNextAndPlay(_toTrack(item));
+  }
+
+  Future<void> _insertNext({
+    required WidgetRef ref,
+    required PlayerHistoryItem item,
+  }) async {
+    await ref
+        .read(playerControllerProvider.notifier)
+        .insertNextTrack(_toTrack(item));
+  }
+
+  Future<void> _appendToQueue({
+    required WidgetRef ref,
+    required PlayerHistoryItem item,
+  }) async {
+    await ref
+        .read(playerControllerProvider.notifier)
+        .appendTrack(_toTrack(item));
+  }
+
+  Future<void> _copyText({
+    required BuildContext context,
+    required String value,
+    required String success,
+  }) async {
+    final text = value.trim();
+    if (text.isEmpty) {
+      final localeCode = Localizations.localeOf(context).languageCode;
+      _showMessage(
+        context,
+        AppI18n.tByLocaleCode(localeCode, 'search.copy_empty'),
+      );
+      return;
+    }
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!context.mounted) {
+      return;
+    }
+    _showMessage(context, success);
+  }
+
+  void _openSongSearch({
+    required BuildContext context,
+    required String platformId,
+    required String keyword,
+  }) {
+    final uri = Uri(
+      path: AppRoutes.onlineSearch,
+      queryParameters: <String, String>{
+        'platform': platformId,
+        'keyword': keyword,
+      },
+    );
+    context.push(uri.toString());
+  }
+
+  void _openSongComments({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String songId,
+    required String platformId,
+    required String title,
+  }) {
+    if (!_platformSupports(
+      ref: ref,
+      platformId: platformId,
+      featureFlag: PlatformFeatureSupportFlag.getCommentList,
+    )) {
+      _showMessage(
+        context,
+        AppI18n.t(ref.read(appConfigProvider), 'search.comment_unsupported'),
+      );
+      return;
+    }
+    final uri = Uri(
+      path: AppRoutes.onlineComments,
+      queryParameters: <String, String>{
+        'id': songId,
+        'resource_type': 'song',
+        'platform': platformId,
+        'title': title,
+      },
+    );
+    context.push(uri.toString());
+  }
+
+  bool _platformSupports({
+    required WidgetRef ref,
+    required String platformId,
+    required BigInt featureFlag,
+  }) {
+    final normalized = platformId.trim();
+    if (normalized.isEmpty || normalized.toLowerCase() == 'local') {
+      return false;
+    }
+    final all = ref.read(onlinePlatformsProvider).valueOrNull;
+    if (all == null) {
+      return true;
+    }
+    for (final platform in all) {
+      if (platform.id != normalized) {
+        continue;
+      }
+      return platform.available && platform.supports(featureFlag);
+    }
+    return false;
+  }
+
+  void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  PlayerTrack _toTrack(PlayerHistoryItem item) {
+    final platform = item.platform?.trim() ?? '';
+    return PlayerTrack(
+      id: item.id,
+      title: item.title.isEmpty ? item.id : item.title,
+      artist: item.artist,
+      album: item.album.isEmpty ? null : item.album,
+      url: platform.toLowerCase() == 'local' ? item.url : '',
+      artworkUrl: item.artworkUrl.isEmpty ? null : item.artworkUrl,
+      platform: platform.isEmpty ? null : platform,
+    );
   }
 
   Future<void> _toggleSongLike({

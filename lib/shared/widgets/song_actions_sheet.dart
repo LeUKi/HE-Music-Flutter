@@ -13,14 +13,14 @@ Future<void> showSongActionsSheet({
   required VoidCallback onPlayNext,
   required VoidCallback onAddToPlaylist,
   required VoidCallback onWatchMv,
-  required VoidCallback onViewComment,
+  VoidCallback? onViewComment,
   String? albumActionLabel,
   VoidCallback? onViewAlbum,
   String? artistActionLabel,
   VoidCallback? onViewArtists,
   required VoidCallback onCopySongName,
-  required VoidCallback onCopySongShareLink,
-  required VoidCallback onSearchSameName,
+  VoidCallback? onCopySongShareLink,
+  VoidCallback? onSearchSameName,
   required VoidCallback onCopySongId,
 }) {
   return showModalBottomSheet<void>(
@@ -81,16 +81,17 @@ Future<void> showSongActionsSheet({
                       }
                     : null,
               ),
-              ListTile(
-                leading: const Icon(Icons.forum_rounded),
-                title: Text(
-                  AppI18n.tByLocaleCode(localeCode, 'player.action.comments'),
+              if (onViewComment != null)
+                ListTile(
+                  leading: const Icon(Icons.forum_rounded),
+                  title: Text(
+                    AppI18n.tByLocaleCode(localeCode, 'player.action.comments'),
+                  ),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    onViewComment();
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  onViewComment();
-                },
-              ),
               if (albumActionLabel != null && onViewAlbum != null)
                 ListTile(
                   leading: const Icon(Icons.album_outlined),
@@ -129,29 +130,34 @@ Future<void> showSongActionsSheet({
                   onCopySongId();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.share_rounded),
-                title: Text(
-                  AppI18n.tByLocaleCode(localeCode, 'player.action.copy_share'),
-                ),
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  onCopySongShareLink();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.search_rounded),
-                title: Text(
-                  AppI18n.tByLocaleCode(
-                    localeCode,
-                    'player.action.search_same',
+              if (onCopySongShareLink != null)
+                ListTile(
+                  leading: const Icon(Icons.share_rounded),
+                  title: Text(
+                    AppI18n.tByLocaleCode(
+                      localeCode,
+                      'player.action.copy_share',
+                    ),
                   ),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    onCopySongShareLink();
+                  },
                 ),
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  onSearchSameName();
-                },
-              ),
+              if (onSearchSameName != null)
+                ListTile(
+                  leading: const Icon(Icons.search_rounded),
+                  title: Text(
+                    AppI18n.tByLocaleCode(
+                      localeCode,
+                      'player.action.search_same',
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    onSearchSameName();
+                  },
+                ),
               _SourceInfoRow(label: sourceLabel),
               const SizedBox(height: 8),
             ],
