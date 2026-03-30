@@ -110,24 +110,6 @@ class _TestMyOverviewController extends MyOverviewController {
 class _FakeMyCollectionRepository implements MyCollectionRepository {
   final Map<MyFavoriteType, List<MyFavoriteItem>> _itemsByType =
       <MyFavoriteType, List<MyFavoriteItem>>{
-        MyFavoriteType.songs: <MyFavoriteItem>[
-          const MyFavoriteItem(
-            id: 'song-1',
-            platform: 'kuwo',
-            type: MyFavoriteType.songs,
-            title: 'ID: song-1',
-            subtitle: 'kuwo',
-            coverUrl: '',
-          ),
-          const MyFavoriteItem(
-            id: 'song-2',
-            platform: 'kuwo',
-            type: MyFavoriteType.songs,
-            title: 'ID: song-2',
-            subtitle: 'kuwo',
-            coverUrl: '',
-          ),
-        ],
         MyFavoriteType.playlists: <MyFavoriteItem>[
           const MyFavoriteItem(
             id: 'playlist-1',
@@ -138,16 +120,7 @@ class _FakeMyCollectionRepository implements MyCollectionRepository {
             coverUrl: '',
           ),
         ],
-        MyFavoriteType.songs: <MyFavoriteItem>[
-          const MyFavoriteItem(
-            id: 'song-1',
-            platform: 'kuwo',
-            type: MyFavoriteType.songs,
-            title: 'ID: song-1',
-            subtitle: 'kuwo',
-            coverUrl: '',
-          ),
-        ],
+        MyFavoriteType.songs: <MyFavoriteItem>[],
         MyFavoriteType.artists: <MyFavoriteItem>[
           const MyFavoriteItem(
             id: 'artist-1',

@@ -1,4 +1,3 @@
-import '../../app/config/app_config_state.dart';
 import '../../features/online/domain/entities/online_platform.dart';
 
 /// 通用封面解析：仅负责 `{x}/{y}` 尺寸占位符替换（按平台 `image_sizes` 选择尺寸）。
