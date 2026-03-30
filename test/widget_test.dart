@@ -1,73 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:he_music_flutter/app/app.dart';
+import 'package:dio/dio.dart';
+import 'package:he_music_flutter/app/config/app_config_controller.dart';
+import 'package:he_music_flutter/app/config/app_config_state.dart';
+import 'package:he_music_flutter/features/home/data/datasources/home_discover_api_client.dart';
 import 'package:he_music_flutter/features/home/domain/entities/home_discover_section.dart';
-import 'package:he_music_flutter/features/home/domain/entities/home_song_source.dart';
 import 'package:he_music_flutter/features/home/domain/entities/home_platform.dart';
-import 'package:he_music_flutter/features/home/domain/repositories/home_discover_repository.dart';
 import 'package:he_music_flutter/features/home/presentation/providers/home_discover_providers.dart';
-import 'package:he_music_flutter/features/my/domain/entities/my_overview.dart';
-import 'package:he_music_flutter/features/my/domain/entities/my_profile.dart';
-import 'package:he_music_flutter/features/my/domain/entities/my_summary.dart';
-import 'package:he_music_flutter/features/my/domain/repositories/my_overview_repository.dart';
-import 'package:he_music_flutter/features/my/presentation/providers/my_overview_providers.dart';
+import 'package:he_music_flutter/features/home/presentation/pages/home_page.dart';
 import 'package:he_music_flutter/features/online/domain/entities/online_platform.dart';
 import 'package:he_music_flutter/features/online/presentation/providers/online_providers.dart';
+import 'package:he_music_flutter/features/player/domain/entities/player_playback_state.dart';
+import 'package:he_music_flutter/features/player/domain/entities/player_track.dart';
+import 'package:he_music_flutter/features/player/presentation/controllers/player_controller.dart';
+import 'package:he_music_flutter/features/player/presentation/providers/player_providers.dart';
 
 void main() {
   testWidgets('home shell renders with two tabs', (WidgetTester tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: <Override>[
-          onlinePlatformsProvider.overrideWith(
-            (ref) async => _fakeOnlinePlatforms,
-          ),
-          homeDiscoverRepositoryProvider.overrideWithValue(
-            const _FakeHomeDiscoverRepository(),
-          ),
-          myOverviewRepositoryProvider.overrideWithValue(
-            const _FakeMyOverviewRepository(),
-          ),
-        ],
-        child: const HeMusicApp(),
-      ),
+      _buildHomeTestApp(apiClient: _TestHomeDiscoverApiClient()),
     );
+    await tester.pumpAndSettle();
 
     expect(find.text('首页'), findsWidgets);
     expect(find.text('我的'), findsOneWidget);
-    expect(find.text('搜索歌曲/歌手/歌单'), findsOneWidget);
     expect(find.text('排行榜'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byIcon(Icons.search_rounded), findsOneWidget);
   });
 
   testWidgets('home discover uses preloaded global platforms', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: <Override>[
-          onlinePlatformsProvider.overrideWith(
-            (ref) async => _fakeOnlinePlatforms,
-          ),
-          homeDiscoverRepositoryProvider.overrideWithValue(
-            const _GlobalPlatformFirstRepository(),
-          ),
-          myOverviewRepositoryProvider.overrideWithValue(
-            const _FakeMyOverviewRepository(),
-          ),
-        ],
-        child: const HeMusicApp(),
-      ),
-    );
+    final apiClient = _TrackingHomeDiscoverApiClient();
 
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pumpWidget(_buildHomeTestApp(apiClient: apiClient));
 
-    expect(find.text('QQ'), findsWidgets);
-    expect(find.text('OFF'), findsNothing);
-    expect(find.text('搜索歌曲/歌手/歌单'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(apiClient.fetchPlatformsCallCount, 0);
+    expect(find.text('排行榜'), findsOneWidget);
+    expect(find.byIcon(Icons.search_rounded), findsOneWidget);
   });
+}
+
+Widget _buildHomeTestApp({required HomeDiscoverApiClient apiClient}) {
+  return ProviderScope(
+    overrides: <Override>[
+      appConfigProvider.overrideWith(_TestAppConfigController.new),
+      playerControllerProvider.overrideWith(_TestPlayerController.new),
+      onlinePlatformsProvider.overrideWith(_TestOnlinePlatformsController.new),
+      homeDiscoverApiClientProvider.overrideWithValue(apiClient),
+      searchDefaultPlaceholderProvider.overrideWith(
+        _TestSearchDefaultPlaceholderController.new,
+      ),
+    ],
+    child: MaterialApp(
+      theme: ThemeData(platform: TargetPlatform.android),
+      home: const HomePage(),
+    ),
+  );
 }
 
 final List<OnlinePlatform> _fakeOnlinePlatforms = <OnlinePlatform>[
@@ -87,8 +80,40 @@ final List<OnlinePlatform> _fakeOnlinePlatforms = <OnlinePlatform>[
   ),
 ];
 
-class _FakeHomeDiscoverRepository implements HomeDiscoverRepository {
-  const _FakeHomeDiscoverRepository();
+class _TestAppConfigController extends AppConfigController {
+  @override
+  AppConfigState build() {
+    return AppConfigState.initial.copyWith(localeCode: 'zh');
+  }
+}
+
+class _TestPlayerController extends PlayerController {
+  @override
+  PlayerPlaybackState build() {
+    return PlayerPlaybackState.initial(const <PlayerTrack>[]);
+  }
+
+  @override
+  Future<void> initialize() async {}
+}
+
+class _TestOnlinePlatformsController extends OnlinePlatformsController {
+  @override
+  Future<List<OnlinePlatform>> build() async {
+    return _fakeOnlinePlatforms;
+  }
+}
+
+class _TestSearchDefaultPlaceholderController
+    extends SearchDefaultPlaceholderController {
+  @override
+  SearchDefaultPlaceholderState build() {
+    return const SearchDefaultPlaceholderState();
+  }
+}
+
+class _TestHomeDiscoverApiClient extends HomeDiscoverApiClient {
+  _TestHomeDiscoverApiClient() : super(Dio());
 
   @override
   Future<List<HomePlatform>> fetchPlatforms() async {
@@ -109,69 +134,14 @@ class _FakeHomeDiscoverRepository implements HomeDiscoverRepository {
   ) async {
     return const <HomeDiscoverSection>[];
   }
-
-  @override
-  Future<HomeSongSource> fetchSongSource({
-    required String songId,
-    required String platformId,
-  }) async {
-    return const HomeSongSource(
-      url: 'https://example.com/test.mp3',
-      format: 'mp3',
-    );
-  }
 }
 
-class _GlobalPlatformFirstRepository implements HomeDiscoverRepository {
-  const _GlobalPlatformFirstRepository();
+class _TrackingHomeDiscoverApiClient extends _TestHomeDiscoverApiClient {
+  int fetchPlatformsCallCount = 0;
 
   @override
-  Future<List<HomePlatform>> fetchPlatforms() async {
-    throw StateError(
-      'fetchPlatforms should not be called when global platform cache exists',
-    );
-  }
-
-  @override
-  Future<List<HomeDiscoverSection>> fetchDiscoverSections(
-    String platformId,
-  ) async {
-    return const <HomeDiscoverSection>[];
-  }
-
-  @override
-  Future<HomeSongSource> fetchSongSource({
-    required String songId,
-    required String platformId,
-  }) async {
-    return const HomeSongSource(
-      url: 'https://example.com/test.mp3',
-      format: 'mp3',
-    );
-  }
-}
-
-class _FakeMyOverviewRepository implements MyOverviewRepository {
-  const _FakeMyOverviewRepository();
-
-  @override
-  Future<MyOverview> fetchOverview() async {
-    return const MyOverview(
-      profile: MyProfile(
-        id: '1',
-        username: 'tester',
-        nickname: 'Tester',
-        email: '',
-        status: 1,
-        avatarUrl: '',
-      ),
-      summary: MySummary(
-        favoriteSongCount: 1,
-        favoritePlaylistCount: 1,
-        favoriteArtistCount: 1,
-        favoriteAlbumCount: 1,
-        createdPlaylistCount: 1,
-      ),
-    );
+  Future<List<HomePlatform>> fetchPlatforms() {
+    fetchPlatformsCallCount += 1;
+    return super.fetchPlatforms();
   }
 }
