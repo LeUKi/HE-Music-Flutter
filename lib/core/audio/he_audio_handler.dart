@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
@@ -679,6 +680,10 @@ class HeAudioHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 late final HeAudioHandler globalHeAudioHandler;
 
 Future<void> initHeAudioHandler() async {
+  // 配置音频会话以支持后台播放
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration.music());
+
   globalHeAudioHandler = await AudioService.init(
     builder: HeAudioHandler.new,
     config: const AudioServiceConfig(

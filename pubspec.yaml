@@ -47,6 +47,7 @@ dependencies:
   flutter_lyric: ^3.0.2
   marquee: ^2.3.0
   audio_service: ^0.18.18
+  audio_session: ^0.1.21
   just_audio_background: ^0.0.1-beta.17
   video_player: ^2.11.1
   saver_gallery: ^4.1.0
