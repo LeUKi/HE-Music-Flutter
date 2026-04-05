@@ -28,7 +28,7 @@ jobs:
       - name: 安装依赖
         run: make get
 
-      - name: 执行 iOS 构建脚本
+      - name: 执行 iOS 无签名构建脚本
         run: |
           chmod +x scripts/build_ios.sh
           ./scripts/build_ios.sh
