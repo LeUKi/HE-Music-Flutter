@@ -1,4 +1,4 @@
-name: Android Release
+name: iOS Release
 
 on:
   push:
@@ -7,26 +7,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  android-release:
-    name: Build Android Artifacts
-    runs-on: ubuntu-latest
+  ios-release:
+    name: Build iOS Artifacts
+    runs-on: macos-latest
     permissions:
       contents: read
     env:
-      APP_NAME: "he-music"
-      JAVA_VERSION: "17"
       FLUTTER_VERSION: "stable"
-      KEYSTORE_PATH: android/keystore/release.jks
 
     steps:
       - name: 检出仓库
         uses: actions/checkout@v4
-
-      - name: 设置 Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
 
       - name: 设置 Flutter
         uses: subosito/flutter-action@v2
@@ -34,85 +25,45 @@ jobs:
           channel: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: 校验 Android 签名配置
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: |
-          for value_name in ANDROID_KEYSTORE_BASE64 ANDROID_STORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
-            if [ -z "${!value_name}" ]; then
-              echo "缺少必需的 GitHub Secret: ${value_name}" >&2
-              exit 1
-            fi
-          done
-
       - name: 安装依赖
         run: make get
 
-      - name: 恢复 Android keystore
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      - name: 执行 iOS 构建脚本
         run: |
-          mkdir -p android/keystore
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "${KEYSTORE_PATH}"
+          chmod +x scripts/build_ios.sh
+          ./scripts/build_ios.sh
 
-      - name: 生成 Android 签名配置
-        env:
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      - name: 存放 iOS 构建产物
         run: |
-          cat > android/key.properties <<EOF
-          storePassword=${ANDROID_STORE_PASSWORD}
-          keyPassword=${ANDROID_KEY_PASSWORD}
-          keyAlias=${ANDROID_KEY_ALIAS}
-          storeFile=keystore/release.jks
-          EOF
+          mkdir -p dist/ios
+          mv iphone.ipa dist/ios/
 
-      - name: 执行发布前检查
-        run: make release-check
-
-      - name: 构建 Android APK
-        run: make build-apk
-
-      - name: 整理 Android 发布文件名
-        run: |
-          mkdir -p dist/android
-          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ -n "${GITHUB_REF_NAME}" ]; then
-            VERSION_NAME="${GITHUB_REF_NAME}"
-          else
-            VERSION_NAME="manual-${GITHUB_RUN_NUMBER}"
-          fi
-          cp build/app/outputs/flutter-apk/app-release.apk "dist/android/${APP_NAME}-${VERSION_NAME}.apk"
-
-      - name: 上传 Android 构建产物
+      - name: 上传 iOS 构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: he-music-android-release
+          name: he-music-ios-release
           path: |
-            dist/android/*.apk
+            dist/ios/*.ipa
           if-no-files-found: error
 
   create-release:
     name: Create GitHub Release
-    needs: android-release
+    needs: ios-release
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     permissions:
       contents: write
 
     steps:
-      - name: 下载 Android 构建产物
+      - name: 下载 iOS 构建产物
         uses: actions/download-artifact@v4
         with:
-          name: he-music-android-release
-          path: artifacts/android
+          name: he-music-ios-release
+          path: artifacts/ios
 
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            artifacts/android/**/*.apk
+            artifacts/ios/**/*.ipa
