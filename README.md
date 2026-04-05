@@ -1,40 +1,21 @@
-# he_music_flutter
+# HE-Music-Flutter (iOS Fork)
 
-这是一个由 AI 驱动的 Flutter 音乐项目。
-欢迎通过 PR 一起完善功能、体验与文档。
-Flutter(我不会)
+这个仓库是 `serious-snow/HE-Music-Flutter` 的一个 fork，主要目标是：
 
-基于 Electron+Vue3 的 PC 版本 [HE-Music](https://github.com/serious-snow/HE-Music.git)
-## 常用命令
+- 仅用于构建 iOS 版本
+- 生成 unsigned IPA 以便后续签名或侧载
+- 保留现有的 Flutter 项目结构
 
-项目根目录已经提供 `Makefile`，以后常用命令直接执行：
+> 本仓库不是官方 App Store / TestFlight 发布流程。
+> 它输出的是供后续签名/分发链路使用的 iOS IPA 产物。
 
-```bash
-make help
-make get
-make run
-make analyze
-make test
-make gen
-make build-aab
-```
+## 说明
 
-常见发布命令：
+仓库的核心用途是生成 iOS App 的构建产物，当前没有包含完整的 Apple 签名流程。
+如果要提交 App Store / TestFlight，还需要在后续步骤中为生成的 IPA 签名。
 
-```bash
-make build-apk
-make build-aab
-```
+## 主要功能
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 使用 GitHub Actions 构建 iOS unsigned IPA
+- 通过 `scripts/build_ios.sh` 生成 `he-music-vX.Y.Z.ipa`
+- 适配当前项目的 iOS 地址和版本策略

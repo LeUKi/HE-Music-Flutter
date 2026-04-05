@@ -682,7 +682,7 @@ late final HeAudioHandler globalHeAudioHandler;
 Future<void> initHeAudioHandler() async {
   // 配置音频会话以支持后台播放
   final session = await AudioSession.instance;
-  await session.configure(const AudioSessionConfiguration.music());
+  await session.configure(AudioSessionConfiguration.music());
 
   globalHeAudioHandler = await AudioService.init(
     builder: HeAudioHandler.new,
